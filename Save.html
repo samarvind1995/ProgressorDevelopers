@@ -1,0 +1,190 @@
+<html>
+ <head>
+ <link rel="icon" type="image/png"  href="icon.png">
+ <link rel="shortcut icon" href="icon.png"/>
+ <title>IM-WI-TI</title>
+
+ 
+ </head>
+ <meta charset="utf-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+ 
+ <style>
+ body{
+ 
+   background-color: #F2EFFB;
+ }
+ .inline {
+  display: inline;
+}
+ </style>
+ 
+ <script>
+ 	
+ </script>
+<body>
+
+<center>
+<b>*** IMDB MOVIE ***</b>
+  <br>
+    <input Type="search" class="searchForm-input" name="FirstName" id="fn" placeholder="enter movie name">
+	 <button type="submit" onClick="addData(fn.value)">submit</button>
+	 
+	  <marquee>
+	 <p class="inline" id="desc"></p>
+	 <pre class="inline">		</pre> 
+	 	 <p class="inline" id="temp_min"> </p>
+		 <pre class="inline">		</pre> 
+		 	 <p class="inline" id="temp_max"> </p>
+			 <pre class="inline">		</pre> 
+	 </marquee>
+   <div style="width: 530px; float:left; margin:5px">
+  <div id="body1"> 				<!-- imdb body div -->
+  
+  <img id="apod_img_id0" width="250px"/>
+  <iframe id="apod_vid_id0" type="text/html" width="640" height="385" frameborder="0"></iframe>  <!-- first response -->
+  <h3 id="Title0"></h3>
+  <h3 id="Year0"></h3>
+  <h3 id="imdbID0"></h3>
+  <h3 id="type0"></h3>
+  
+  <br/><br></br>
+ 
+  
+  <img id="apod_img_id1" width="250px"/>
+  <iframe id="apod_vid_id1" type="text/html" width="640" height="385" frameborder="0"></iframe>	<!-- second response -->
+  <h3 id="Title1"></h3>
+  <h3 id="Year1"></h3>
+  <h3 id="imdbID1"></h3>
+  <h3 id="type1"></h3>
+
+
+  <br/><br></br>
+  
+  
+  <img id="apod_img_id2" width="250px"/>
+  <iframe id="apod_vid_id2" type="text/html" width="640" height="385" frameborder="0"></iframe>		<!-- third response -->
+  <h3 id="Title2"></h3>
+  <h3 id="Year2"></h3>
+  <h3 id="imdbID2"></h3>
+  <h3 id="type2"></h3>
+  
+ 
+  </div>
+</div>
+
+<div style="width: 530px; float:right; margin:5px" id="body2">  <!-- wiki body div -->
+		<center>
+   
+
+    <section class="searchResults"></section>
+	</div>
+	
+	
+	
+	<script>
+	
+function addData (fn) {
+
+let t1;
+var url = "http://www.omdbapi.com/?i=tt3896198&apikey=d9aa39cd&s="+fn;
+$.ajax({
+  url: url,
+  success: function(result){
+  if("Search" in result) {
+  t1=result.Search[0].Title;
+  
+		$("#Title0").text("Title : " + result.Search[0].Title);
+		$("#Year0").text("Year : " + result.Search[0].Year);
+		$("#imdbID0").text("imdbID : " + result.Search[0].imdbID);
+		$("#type0").text("Type : " + result.Search[0].Type);
+		$("#apod_vid_id0").css("display", "none"); 
+		$("#apod_img_id0").attr("src",  result.Search[0].Poster);
+
+
+		$("#Title1").text("Title : " + result.Search[1].Title);
+		$("#Year1").text("Year : " + result.Search[1].Year);
+		$("#imdbID1").text("imdbID : " + result.Search[1].imdbID);
+		$("#type1").text("Type : " + result.Search[1].Type);
+		$("#apod_vid_id1").css("display", "none"); 
+		$("#apod_img_id1").attr("src",  result.Search[1].Poster);
+		
+		
+		$("#Title2").text("Title : " + result.Search[2].Title);
+		$("#Year2").text("Year : " + result.Search[2].Year);
+		$("#imdbID2").text("imdbID : " + result.Search[2].imdbID);
+		$("#type2").text("Type : " + result.Search[2].Type);
+		$("#apod_vid_id2").css("display", "none"); 
+		$("#apod_img_id2").attr("src",  result.Search[2].Poster);
+		
+		
+		
+		
+		let lat,lng;
+var url1 = "https://api.openweathermap.org/data/2.5/weather?q="+fn+"&appid=d10fc43dd0a04fb92abf7678219cde0d";
+$.ajax({
+  url: url1,
+  success: function(result){
+
+		 desc = result.weather[0].description;
+         temp_min= result.main.temp_min;
+		 temp_max= result.main.temp_max;
+		
+		$("#desc").text("desc : " + desc);
+		$("#temp_min").text("temp_min : " + temp_min+" F" );
+			$("#temp_max").text("temp_max : " + temp_max+" F" );
+		
+		}
+		});
+		
+		
+
+		
+		
+		
+	  const endpoint = "https://en.wikipedia.org/w/api.php?action=query&list=search&prop=info&inprop=url&utf8=&format=json&origin=*&srlimit=20&srsearch="+fn;
+  	fetch(endpoint)
+  		.then(response => response.json())
+  		.then(data => {
+  	  	const results = data.query.search;
+        displayResults(results);
+		})
+    .catch(() => console.log('Inside wiki>>>>>huedgf>>',t1));
+
+function displayResults(results) {
+ 
+  const searchResults = document.querySelector('.searchResults');
+
+  searchResults.innerHTML = '';
+
+  results.forEach(result => {
+   const url = encodeURI(`https://en.wikipedia.org/wiki/${result.title}`);
+
+   searchResults.insertAdjacentHTML('beforeend',
+      `<div class="resultItem">
+        <h3 class="resultItem-title">
+          <a href="${url}" target="_blank" rel="noopener">${result.title}</a>
+        </h3>
+        <span class="resultItem-snippet">${result.snippet}</span><br>
+        <a href="${url}" class="resultItem-link" target="_blank" rel="noopener">${url}</a>
+      </div>`
+	  
+    );
+  });
+  
+}
+}
+else
+{
+window.location.reload();
+alert("Movie not found ");
+ $('#fn').val('');
+}
+}
+});
+}
+
+	</script> 
+</body>
+ </html>
+
